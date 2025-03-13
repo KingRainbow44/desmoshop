@@ -7,13 +7,10 @@
   "content_scripts": [
     {
       "js": ["content.ts"],
-      "matches": ["https://www.desmos.com/**/*"],
+      "matches": ["https://*.desmos.com/*"],
       "run_at": "document_start"
     }
   ],
-  "background": {
-    "service_worker": "src/background.ts"
-  },
   "web_accessible_resources": [
     {
       "resources": ["**/*"],
