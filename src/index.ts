@@ -1,6 +1,6 @@
 import Logger from "@app/Logger.ts";
-import Desmos from "@app/Desmos.tsx";
-import Grapher from "@graphing/Grapher.ts";
+import Desmos from "@graphing/Desmos.tsx";
+import Interaction from "@app/Interaction.ts";
 
 /**
  * Initializer function for the `desmosshop` app.
@@ -13,16 +13,9 @@ async function initialize() {
         this.splice(to, 0, this.splice(from, 1)[0]);
     };
 
-    // Disable scroll zooming.
-    document.body.addEventListener("wheel", (event) => {
-        if (event.ctrlKey) {
-            event.preventDefault();
-        }
-    }, { passive: false });
-
     // Initialize the `desmosshop` app.
     Desmos.init();
-    Grapher.init();
+    Interaction.init();
 }
 
 setTimeout(() => {

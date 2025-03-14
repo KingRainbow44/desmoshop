@@ -1,7 +1,5 @@
 type Consumer = ((t: Transaction) => void) | undefined;
 
-const LINE = `y-{{Y_START}}={{SLOPE}}\\left(x-{{X_MIN}}\\right)\\left\\{{{X_MIN}}\\le x\\le{{X_MAX}}\\right\\}`;
-
 /**
  * A transaction is a set of operations that can only occur during state changes.
  */
@@ -100,7 +98,10 @@ class Transaction {
      * @param condition The condition to check.
      * @param callback The callback to execute if the condition is true.
      */
-    public cond(condition: boolean, callback: (t: Transaction, lastId: string) => void | Transaction): Transaction {
+    public cond(
+        condition: boolean,
+        callback: (t: Transaction, lastId: string) => void | Transaction
+    ): Transaction {
         if (condition) {
             callback(this, this.lastId);
         }
@@ -109,67 +110,15 @@ class Transaction {
     }
 
     /**
-     * Adds a point to the transaction.
-     *
-     * @param x The x-coordinate of the point.
-     * @param y The y-coordinate of the point.
-     */
-    public point(x: number, y: number): Transaction {
-        this._points.push({ x, y });
-        return this;
-    }
-
-    /**
-     * Creates a line from the points in the transaction.
-     *
-     * @param parent The parent folder.
-     */
-    public line(parent?: string): Transaction {
-        // Throw an error if there are not enough points.
-        if (this._points.length < 2) {
-            throw new Error("Not enough points to create a line.");
-        }
-
-        // Calculate values needed to create the line.
-        const m = (
-            (this._points[1].y - this._points[0].y) /
-            (this._points[1].x - this._points[0].x)
-        ).toFixed(3);
-
-        // Create the line expression.
-        const xMin = Math.min(this._points[0].x, this._points[1].x);
-        const xMax = Math.max(this._points[0].x, this._points[1].x);
-
-        const expr = LINE
-            .replaceAll("{{X_MIN}}", xMin.toString())
-            .replaceAll("{{X_MAX}}", xMax.toString())
-            .replaceAll("{{Y_START}}", this._points[0].y.toString())
-            .replaceAll("{{SLOPE}}", m);
-
-        // Add the expression to the transaction.
-        this.expression((id) => ({
-            type: "expression",
-            id,
-            latex: expr,
-            color: "#000000"
-        }));
-
-        // Set the parent.
-        if (parent) {
-            this.parent(this.lastId, parent);
-        }
-
-        // Clear the points array.
-        this._points.length = 0;
-
-        return this;
-    }
-
-    /**
      * Finalizes the transaction.
      */
     public commit(): void {
-        Calc.setState(this.state, { allowUndo: true });
+        // Merge the transaction state with the current state.
+        const merged = this.state;
+        merged.graph = Calc.getState().graph;
+
+        // Update the expressions.
+        Calc.setState(merged, { allowUndo: true });
 
         if (this.consumer) {
             this.consumer(this);

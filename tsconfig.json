@@ -25,9 +25,11 @@
     "paths": {
       "@app/*": ["src/*"],
       "@ui/*": ["src/ui/*"],
-      "@graphing/*": ["src/graphing/*"]
+      "@graphing/*": ["src/graphing/*"],
+      "@stores/*": ["src/stores/*"],
+      "@hooks/*": ["src/hooks/*"]
     }
   },
-  "include": ["src", "content.ts"],
+  "include": ["src", "content.ts", "global.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

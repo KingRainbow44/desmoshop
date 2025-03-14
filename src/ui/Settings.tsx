@@ -5,7 +5,7 @@ function Settings() {
 
     return (
         <div>
-            <span>Precision: {state.gridSnap}dp</span>
+            <span>Precision: {state.precision}dp</span>
         </div>
     );
 }

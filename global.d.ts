@@ -179,6 +179,14 @@ declare global {
         expressions: {
             list: Array<ExpressionState>;
         };
+        graph: {
+            viewport: {
+                xmin: number;
+                xmax: number;
+                ymin: number;
+                ymax: number;
+            };
+        };
     };
 
     type GraphController = {
