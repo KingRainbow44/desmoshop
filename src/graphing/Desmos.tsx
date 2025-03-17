@@ -8,7 +8,7 @@ import useGlobal from "@stores/Global.ts";
 /**
  * This regular expression is used to match a point in LaTeX.
  */
-const POINT_REGEX = /\\left\((.*),(.*)\\right\)/;
+const POINT_REGEX = /\((.*),(.*)\)/;
 
 type Point = Coordinates & {
     reference?: boolean | undefined;
@@ -46,6 +46,8 @@ class Desmos {
 
         // Create task to update points.
         setInterval(Desmos.updatePoints, 10e3);
+        // Add function to fetch points.
+        (window as any).getPoints = () => Desmos.pointCache;
 
         Logger.info("Loaded Desmos library.");
     }
@@ -179,7 +181,7 @@ class Desmos {
             .getBoundingClientRect();
 
         // Convert the mouse coordinates into graph coordinates.
-        const clickedPoint = window.Calc.pixelsToMath({
+        const cursor = window.Calc.pixelsToMath({
             x: event.clientX - container.left,
             y: event.clientY - container.top
         });
@@ -188,8 +190,8 @@ class Desmos {
             // Identify the closest point using the cache.
             const closest = Desmos
                 .pointCache
-                .filter((point) => Desmos.distance(point, clickedPoint) <= pointSnap)
-                .sort((a, b) => Desmos.distance(a, clickedPoint) - Desmos.distance(b, clickedPoint))
+                .filter((point) => Desmos.distance(point, cursor) <= pointSnap)
+                .sort((a, b) => Desmos.distance(a, cursor) - Desmos.distance(b, cursor))
                 .shift();
 
             // If there is a point, return it.
@@ -200,8 +202,8 @@ class Desmos {
 
         // Otherwise, round the clicked point to the grid.
         return {
-            x: parseFloat(clickedPoint.x.toFixed(precision)),
-            y: parseFloat(clickedPoint.y.toFixed(precision))
+            x: parseFloat(cursor.x.toFixed(precision)),
+            y: parseFloat(cursor.y.toFixed(precision))
         };
     }
 
