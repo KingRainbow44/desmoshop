@@ -47,7 +47,8 @@ class Line extends BaseObject {
             const minY = Math.min(first.y, second.y);
             const maxY = Math.max(first.y, second.y);
 
-            // y=x
+            // graphed using x=x_{1}
+            // restricted by minY <= y <= maxY
             transaction.expression(id => ({
                 type: "expression", id,
                 latex: `x=${first.x}\\left\\{${minY}\\le y\\le${maxY}\\right\\}`,
@@ -62,7 +63,8 @@ class Line extends BaseObject {
             const { precision } = useGlobal.getState();
             const roundedSlope = m.toFixed(precision);
 
-            // y-y_{1}=m\left(x-x_{1}\right)
+            // graphed using y-y_{1}=m\left(x-x_{1}\right)
+            // restricted by minX <= x <= maxX
             transaction.expression(id => ({
                 type: "expression", id,
                 latex: `y-${first.y}=${roundedSlope}\\left(x-${first.x}\\right)\\left\\{${minX}\\le x\\le${maxX}\\right\\}`,
