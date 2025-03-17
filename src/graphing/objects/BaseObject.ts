@@ -47,6 +47,13 @@ abstract class BaseObject {
     public abstract shouldRender(): boolean;
 
     /**
+     * A method to render a preview of the object.
+     *
+     * This is optional to implement.
+     */
+    public renderPreview(): void {}
+
+    /**
      * A method to destroy the object.
      *
      * This is optional to implement.
@@ -61,6 +68,7 @@ export default BaseObject;
  */
 export enum Objects {
     Line,
+    Circle,
     Parabola,
     Ellipse
 }

@@ -12,6 +12,7 @@ type Shortcuts = { [key: string]: Handler };
  */
 const KEYBOARD_SHORTCUTS: Shortcuts = {
     "Digit1": Actions.line,
+    "Digit2": Actions.circle,
     "Backquote": Actions.folders,
 
     // Inline keyboard shortcuts for changing the precision.
@@ -26,7 +27,8 @@ const KEYBOARD_SHORTCUTS: Shortcuts = {
  */
 const KEYBOARD_ACTIONS: Shortcuts = {
     "Escape": Actions.reset,
-    "Numpad1": Actions.line
+    "Numpad1": Actions.line,
+    "Numpad2": Actions.circle
 };
 
 /**

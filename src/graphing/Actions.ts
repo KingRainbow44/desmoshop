@@ -3,6 +3,7 @@ import { EventEmitter } from "events";
 import Desmos from "@graphing/Desmos.tsx";
 import BaseObject, { Objects } from "@graphing/objects/BaseObject.ts";
 import Line from "@graphing/objects/Line.ts";
+import Circle from "@graphing/objects/Circle.ts";
 
 /**
  * The types of events to be emitted by the grapher.
@@ -110,6 +111,20 @@ class Actions {
             instance: Actions.working
         } as NewObject);
     }
+
+    /**
+     * Initializes graphing a circle.
+     */
+    public static circle(): void {
+        // Create a new circle instance.
+        Actions.working = new Circle();
+
+        // Emit the event.
+        Actions.emitter.emit(Events.NewObject, {
+            object: Objects.Circle,
+            instance: Actions.working
+        } as NewObject);
+    }
 }
 
 export default Actions;
@@ -119,7 +134,7 @@ export default Actions;
  */
 export type NewObject = {
     type: "newObject";
-} & NewLineObject;
+} & (NewLineObject | NewCircleObject);
 
 /**
  * An event signifying the creation of a new line object.
@@ -127,4 +142,12 @@ export type NewObject = {
 export type NewLineObject = {
     object: Objects.Line,
     instance: Line
+};
+
+/**
+ * An event signifying the creation of a new circle object.
+ */
+export type NewCircleObject = {
+    object: Objects.Circle,
+    instance: Circle
 };
