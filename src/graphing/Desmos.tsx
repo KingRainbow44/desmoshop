@@ -2,7 +2,7 @@ import Logger from "@app/Logger.ts";
 import { createRoot } from "react-dom/client";
 
 import Settings from "@ui/Settings.tsx";
-import Transaction from "@graphing/Transaction.ts";
+import Transaction, { Consumer } from "@graphing/Transaction.ts";
 import useGlobal from "@stores/Global.ts";
 
 /**
@@ -14,6 +14,10 @@ type Point = Coordinates & {
     reference?: boolean | undefined;
 };
 
+type CachedPoint = Coordinates & {
+    id: string | undefined;
+};
+
 class Desmos {
     private static container: HTMLDivElement | undefined = undefined;
 
@@ -21,7 +25,7 @@ class Desmos {
      * This is a cache of all known coordinates.
      * @private
      */
-    private static pointCache: Coordinates[] = [];
+    private static pointCache: CachedPoint[] = [];
 
     /**
      * Loads all elements needed for the Desmos library.
@@ -46,6 +50,7 @@ class Desmos {
 
         // Create task to update points.
         setInterval(Desmos.updatePoints, 10e3);
+        setTimeout(Desmos.updatePoints, 1e3);
         // Add function to fetch points.
         (window as any).getPoints = () => Desmos.pointCache;
 
@@ -66,8 +71,8 @@ class Desmos {
     /**
      * Creates a state transaction.
      */
-    public static transaction(): Transaction {
-        return new Transaction(Calc.getState());
+    public static transaction(consumer?: Consumer | undefined): Transaction {
+        return new Transaction(Calc.getState(), consumer);
     }
 
     /**
@@ -88,7 +93,10 @@ class Desmos {
     public static newPoint(point: Point): void {
         const { x, y } = point;
 
-        Desmos.transaction()
+        Desmos.transaction((t) => {
+            // Update the point cache.
+            Desmos.pointCache.push({ x, y, id: t.lastId });
+        })
             .expression((id) => ({
                 type: "expression",
                 latex: `(${x},${y})`,
@@ -99,9 +107,6 @@ class Desmos {
                 (t, id) => t.parent(id, "reference-points")
             )
             .commit();
-
-        // Update the point cache.
-        Desmos.pointCache.push({ x, y });
     }
 
     /**
@@ -154,10 +159,28 @@ class Desmos {
                 }
 
                 const [, x, y] = POINT_REGEX.exec(expr.latex) as string[];
-                return { x: parseFloat(x), y: parseFloat(y) } as Coordinates;
+                return { x: parseFloat(x), y: parseFloat(y), id: expr.id } as CachedPoint;
             })
             // Filter out undefined values.
             .filter((point) => point != undefined);
+    }
+
+    /**
+     * Returns the coordinates of the mouse event.
+     *
+     * @param event The mouse event.
+     */
+    public static mouseCoords(event: MouseEvent): Coordinates {
+        // Get the graph container.
+        const container = Desmos
+            .getContainer()
+            .getBoundingClientRect();
+
+        // Convert the mouse coordinates into graph coordinates.
+        return window.Calc.pixelsToMath({
+            x: event.clientX - container.left,
+            y: event.clientY - container.top
+        });
     }
 
     /**
@@ -171,26 +194,24 @@ class Desmos {
      *
      * @param event The mouse event.
      * @param others Should other points be considered?
+     * @param maxDistance The maximum distance to consider.
      */
-    public static resolvePoint(event: MouseEvent, others: boolean = true): Coordinates {
+    public static resolvePoint(
+        event: MouseEvent,
+        others: boolean = true,
+        maxDistance: number = -1
+    ): CachedPoint {
         const { precision, pointSnap } = useGlobal.getState();
 
-        // Get the graph container.
-        const container = Desmos
-            .getContainer()
-            .getBoundingClientRect();
-
-        // Convert the mouse coordinates into graph coordinates.
-        const cursor = window.Calc.pixelsToMath({
-            x: event.clientX - container.left,
-            y: event.clientY - container.top
-        });
+        // Get the cursor point.
+        const cursor = Desmos.mouseCoords(event);
 
         if (others) {
             // Identify the closest point using the cache.
             const closest = Desmos
                 .pointCache
                 .filter((point) => Desmos.distance(point, cursor) <= pointSnap)
+                .filter((point) => maxDistance == -1 || Desmos.distance(point, cursor) <= maxDistance)
                 .sort((a, b) => Desmos.distance(a, cursor) - Desmos.distance(b, cursor))
                 .shift();
 
@@ -203,7 +224,8 @@ class Desmos {
         // Otherwise, round the clicked point to the grid.
         return {
             x: parseFloat(cursor.x.toFixed(precision)),
-            y: parseFloat(cursor.y.toFixed(precision))
+            y: parseFloat(cursor.y.toFixed(precision)),
+            id: undefined
         };
     }
 

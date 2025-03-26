@@ -1,10 +1,13 @@
-type Consumer = ((t: Transaction) => void) | undefined;
+/**
+ * A transaction callback consumer.
+ */
+export type Consumer = ((t: Transaction) => void) | undefined;
 
 /**
  * A transaction is a set of operations that can only occur during state changes.
  */
 class Transaction {
-    private lastId: string = "";
+    public lastId: string = "";
     private _points: Coordinates[] = [];
 
     constructor(

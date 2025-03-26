@@ -49,7 +49,7 @@ class Interaction {
         window.addEventListener("wheel", Interaction.handleScroll, { passive: false });
 
         // Listen for user clicks.
-        window.addEventListener("click", Interaction.handleClick, true);
+        window.addEventListener("mousedown", Interaction.handleClick, true);
 
         // Listen for user key presses.
         window.addEventListener("keydown", Interaction.handleKey);
@@ -119,33 +119,73 @@ class Interaction {
         // Check if we are operating within an action.
         const isAction = Actions.isWorking();
 
-        // Resolve the clicked point.
-        // If we are in an action, we should try looking at other points.
-        const point = Desmos.resolvePoint(event, isAction);
+        switch (event.button) {
+            case 0: {
+                // Resolve the clicked point.
+                // If we are in an action, we should try looking at other points.
+                const point = Desmos.resolvePoint(event, isAction);
 
-        if (isAction) {
-            // If we are working, invoke the 'addPoint' method.
+                if (isAction) {
+                    // If we are working, invoke the 'addPoint' method.
 
-            // Prevent the default behavior.
-            event.preventDefault();
-            event.stopImmediatePropagation();
+                    // Prevent the default behavior.
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
 
-            // Add the point.
-            Actions.addPoint(point);
-        } else {
-            // Else, we should try adding a point to the graph.
+                    // Add the point.
+                    Actions.addPoint(point);
+                } else {
+                    // Else, we should try adding a point to the graph.
 
-            // If the user is not holding the 'Super' key, ignore the event.
-            if (!Interaction.isHoldingSuper(event)) {
-                return;
+                    // If the user is not holding the 'Super' key, ignore the event.
+                    if (!Interaction.isHoldingSuper(event)) {
+                        return;
+                    }
+
+                    // Prevent the default behavior.
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+
+                    // Plot the point.
+                    Desmos.newPoint({ ...point, reference: true });
+                }
+
+                break;
             }
+            case 1: {
+                // If we aren't holding the super key, ignore the event.
+                if (!Interaction.isHoldingSuper(event)) {
+                    return;
+                }
 
-            // Prevent the default behavior.
-            event.preventDefault();
-            event.stopImmediatePropagation();
+                // Resolve the clicked point.
+                // If we are in an action, we should try looking at other points.
+                const point = Desmos.resolvePoint(event);
 
-            // Plot the point.
-            Desmos.newPoint({ ...point, reference: true });
+                // Prevent the default behavior.
+                event.preventDefault();
+                event.stopImmediatePropagation();
+
+                // Delete the selected line.
+                const expressionId = Calc.selectedExpressionId;
+                const expression = Calc.getExpressions()
+                    .filter((expr) => expr.id == expressionId)
+                    .pop();
+
+                let id: string | undefined = undefined;
+                if (expression == undefined || expression.type != "expression") {
+                    id = point.id;
+                } else {
+                    id = expression.id;
+                }
+
+                // Remove the point.
+                if (id) {
+                    Calc.removeExpression({ id });
+                }
+
+                break;
+            }
         }
 
         // Try running actions.
