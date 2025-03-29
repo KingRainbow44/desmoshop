@@ -1,6 +1,9 @@
 import Logger from "@app/Logger.ts";
 import Desmos from "@graphing/Desmos.tsx";
 import Interaction from "@app/Interaction.ts";
+import ContextMenu from "@app/ContextMenu.tsx";
+
+import "react-contexify/dist/ReactContexify.css";
 
 /**
  * Initializer function for the `desmosshop` app.
@@ -15,6 +18,7 @@ async function initialize() {
 
     // Initialize the `desmosshop` app.
     Desmos.init();
+    ContextMenu.init();
     Interaction.init();
 }
 

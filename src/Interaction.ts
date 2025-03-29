@@ -1,6 +1,7 @@
 import Actions from "@graphing/Actions.ts";
 import Desmos from "@graphing/Desmos.tsx";
 import useGlobal from "@stores/Global.ts";
+import ContextMenu from "@app/ContextMenu.tsx";
 
 type Handler = (event: KeyboardEvent) => void;
 type Shortcuts = { [key: string]: Handler };
@@ -50,6 +51,7 @@ class Interaction {
 
         // Listen for user clicks.
         window.addEventListener("mousedown", Interaction.handleClick, true);
+        window.addEventListener("contextmenu", Interaction.handleContext);
 
         // Listen for user key presses.
         window.addEventListener("keydown", Interaction.handleKey);
@@ -158,31 +160,27 @@ class Interaction {
                     return;
                 }
 
-                // Resolve the clicked point.
-                // If we are in an action, we should try looking at other points.
-                const point = Desmos.resolvePoint(event);
-
                 // Prevent the default behavior.
                 event.preventDefault();
                 event.stopImmediatePropagation();
 
-                // Delete the selected line.
-                const expressionId = Calc.selectedExpressionId;
-                const expression = Calc.getExpressions()
-                    .filter((expr) => expr.id == expressionId)
-                    .pop();
-
-                let id: string | undefined = undefined;
-                if (expression == undefined || expression.type != "expression") {
-                    id = point.id;
-                } else {
-                    id = expression.id;
+                // Delete the selected element.
+                const element = Desmos.selectElement(event);
+                if (element?.id != undefined) {
+                    Calc.removeExpression({ id: element.id });
                 }
 
-                // Remove the point.
-                if (id) {
-                    Calc.removeExpression({ id });
+                break;
+            }
+            case 2: {
+                // Get the selected equation.
+                const expression = Desmos.selectElement(event);
+                if (expression == undefined) {
+                    break;
                 }
+
+                // Mount the context menu.
+                ContextMenu.mountMenu(event, expression);
 
                 break;
             }
@@ -190,6 +188,19 @@ class Interaction {
 
         // Try running actions.
         Actions.tryRender();
+    }
+
+    /**
+     * Handles the context menu event.
+     *
+     * @param event The mouse event.
+     * @private
+     */
+    private static handleContext(event: MouseEvent): void {
+        // Desmos doesn't use the right-click menu,
+        // so we can always cancel it.
+        event.preventDefault();
+        event.stopImmediatePropagation();
     }
 
     /**
