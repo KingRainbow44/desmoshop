@@ -1,7 +1,7 @@
 import { EventEmitter } from "events";
 
 import Desmos from "@graphing/Desmos.tsx";
-import BaseObject, { Objects } from "@graphing/objects/BaseObject.ts";
+import BaseObject, { Objects, Operations } from "@graphing/BaseObject.ts";
 import Line from "@graphing/objects/Line.ts";
 import Circle from "@graphing/objects/Circle.ts";
 
@@ -128,6 +128,11 @@ class Actions {
 }
 
 export default Actions;
+
+/**
+ * An expression.
+ */
+export type Expression = ExpressionState & { type: "expression" };
 
 /**
  * An event signifying the start of a new object.

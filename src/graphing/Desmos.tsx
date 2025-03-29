@@ -158,8 +158,8 @@ class Desmos {
                     return undefined;
                 }
 
-                const [, x, y] = POINT_REGEX.exec(expr.latex) as string[];
-                return { x: parseFloat(x), y: parseFloat(y), id: expr.id } as CachedPoint;
+                const point = Desmos.parsePoint(expr.latex);
+                return { ...point, id: expr.id } as CachedPoint;
             })
             // Filter out undefined values.
             .filter((point) => point != undefined);
@@ -227,6 +227,51 @@ class Desmos {
             y: parseFloat(cursor.y.toFixed(precision)),
             id: undefined
         };
+    }
+
+    /**
+     * Selects an expression.
+     *
+     * This considers if an expression is selected.
+     * It will use the nearest point otherwise.
+     *
+     * If nothing is nearby, this will return undefined.
+     *
+     * @param event The mouse event.
+     */
+    public static selectElement(event: MouseEvent): ExpressionState | undefined {
+        // Check if we have an expression selected.
+        const expressionId = Calc.selectedExpressionId;
+        const expression = Calc.getExpressions()
+            .filter((expr) => expr.type == "expression")
+            .filter((expr) => expr.id == expressionId)
+            .pop();
+
+        // If we have an expression, return it.
+        if (expression != undefined) {
+            return expression;
+        }
+
+        // Otherwise, resolve the point.
+        const point = Desmos.resolvePoint(event);
+        return Calc.getExpressions()
+            .filter((expr) => expr.id == point.id)
+            .pop();
+    }
+
+    /**
+     * Parses a point in LaTeX into a {@link Coordinates} object.
+     *
+     * @param latex The LaTeX string to parse.
+     */
+    public static parsePoint(latex: string): Coordinates | undefined {
+        // Test the string.
+        if (!POINT_REGEX.test(latex)) {
+            return undefined;
+        }
+
+        const [, x, y] = POINT_REGEX.exec(latex) as string[];
+        return { x: parseFloat(x), y: parseFloat(y) };
     }
 
     /**

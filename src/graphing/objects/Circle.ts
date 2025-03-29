@@ -1,5 +1,5 @@
 import Desmos from "@graphing/Desmos.tsx";
-import BaseObject from "@graphing/objects/BaseObject.ts";
+import BaseObject from "@graphing/BaseObject.ts";
 import useGlobal from "@stores/Global.ts";
 
 /**

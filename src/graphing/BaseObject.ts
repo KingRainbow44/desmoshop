@@ -72,3 +72,11 @@ export enum Objects {
     Parabola,
     Ellipse
 }
+
+/**
+ * The types of operations supported by the grapher.
+ */
+export enum Operations {
+    Restriction,
+    Exclusion
+}
