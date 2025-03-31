@@ -4,6 +4,9 @@ import Desmos from "@graphing/Desmos.tsx";
 import BaseObject, { Objects, Operations } from "@graphing/BaseObject.ts";
 import Line from "@graphing/objects/Line.ts";
 import Circle from "@graphing/objects/Circle.ts";
+import Parabola from "@graphing/objects/Parabola.ts";
+import Restriction from "@graphing/operations/Restriction.ts";
+import Exclusion from "@graphing/operations/Exclusion.ts";
 
 /**
  * The types of events to be emitted by the grapher.
@@ -107,6 +110,7 @@ class Actions {
 
         // Emit the event.
         Actions.emitter.emit(Events.NewObject, {
+            type: "newObject",
             object: Objects.Line,
             instance: Actions.working
         } as NewObject);
@@ -121,9 +125,55 @@ class Actions {
 
         // Emit the event.
         Actions.emitter.emit(Events.NewObject, {
+            type: "newObject",
             object: Objects.Circle,
             instance: Actions.working
         } as NewObject);
+    }
+
+    /**
+     * Initializes graphing a parabola.
+     */
+    public static parabola(): void {
+        // Create a new parabola instance.
+        Actions.working = new Parabola();
+
+        // Emit the event.
+        Actions.emitter.emit(Events.NewObject, {
+            type: "newObject",
+            object: Objects.Parabola,
+            instance: Actions.working
+        } as NewObject);
+    }
+
+    /**
+     * Adds a restriction to the working expression.
+     */
+    public static restriction(expression: Expression): void {
+        // Create a new restriction.
+        Actions.working = new Restriction(expression);
+
+        // Emit the event.
+        Actions.emitter.emit(Events.NewObject, {
+            type: "newOperation",
+            operation: Operations.Restriction,
+            instance: Actions.working
+        } as NewOperation);
+    }
+
+    /**
+     * Adds an exclusion to the working expression.
+     */
+    public static exclusion(expression: Expression): void {
+        // Create a new exclusion.
+        Actions.working = new Exclusion(expression);
+
+        // Emit the event.
+        Actions.emitter.emit(Events.NewObject, {
+            type: "newOperation",
+            operation: Operations.Exclusion,
+            instance: Actions.working
+        } as NewOperation);
     }
 }
 
@@ -139,7 +189,14 @@ export type Expression = ExpressionState & { type: "expression" };
  */
 export type NewObject = {
     type: "newObject";
-} & (NewLineObject | NewCircleObject);
+} & (NewLineObject | NewCircleObject | NewParabolaObject);
+
+/**
+ * An event signifying the start of a new operation.
+ */
+export type NewOperation = {
+    type: "newOperation";
+} & (NewRestriction | NewExclusion);
 
 /**
  * An event signifying the creation of a new line object.
@@ -156,3 +213,27 @@ export type NewCircleObject = {
     object: Objects.Circle,
     instance: Circle
 };
+
+/**
+ * An event signifying the creation of a new parabola object.
+ */
+export type NewParabolaObject = {
+    object: Objects.Parabola,
+    instance: Parabola
+};
+
+/**
+ * An event signifying the creation of a new restriction.
+ */
+export type NewRestriction = {
+    operation: Operations.Restriction,
+    instance: Restriction
+};
+
+/**
+ * An event signifying the creation of a new exclusion.
+ */
+export type NewExclusion = {
+    operation: Operations.Exclusion,
+    instance: Exclusion
+}
