@@ -3,6 +3,7 @@ import Desmos from "@graphing/Desmos.tsx";
 import Interaction from "@app/Interaction.ts";
 import ContextMenu from "@app/ContextMenu.tsx";
 
+import "@app/global.css";
 import "react-contexify/dist/ReactContexify.css";
 
 /**
