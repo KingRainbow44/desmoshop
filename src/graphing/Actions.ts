@@ -1,12 +1,15 @@
 import { EventEmitter } from "events";
 
 import Desmos from "@graphing/Desmos.tsx";
-import BaseObject, { Objects, Operations } from "@graphing/BaseObject.ts";
+
 import Line from "@graphing/objects/Line.ts";
 import Circle from "@graphing/objects/Circle.ts";
 import Parabola from "@graphing/objects/Parabola.ts";
 import Restriction from "@graphing/operations/Restriction.ts";
 import Exclusion from "@graphing/operations/Exclusion.ts";
+
+import BaseObject, { Objects, Operations } from "@graphing/BaseObject.ts";
+import Table from "@graphing/operations/Table.ts";
 
 /**
  * The types of events to be emitted by the grapher.
@@ -175,6 +178,21 @@ class Actions {
             instance: Actions.working
         } as NewOperation);
     }
+
+    /**
+     * Adds a table based on the points selected.
+     */
+    public static table(): void {
+        // Create a new table instance.
+        Actions.working = new Table();
+
+        // Emit the event.
+        Actions.emitter.emit(Events.NewObject, {
+            type: "newObject",
+            object: Objects.Table,
+            instance: Actions.working
+        } as NewObject);
+    }
 }
 
 export default Actions;
@@ -189,7 +207,7 @@ export type Expression = ExpressionState & { type: "expression" };
  */
 export type NewObject = {
     type: "newObject";
-} & (NewLineObject | NewCircleObject | NewParabolaObject);
+} & (NewLineObject | NewCircleObject | NewParabolaObject | NewTableObject);
 
 /**
  * An event signifying the start of a new operation.
@@ -220,6 +238,14 @@ export type NewCircleObject = {
 export type NewParabolaObject = {
     object: Objects.Parabola,
     instance: Parabola
+};
+
+/**
+ * An event signifying the creation of a new table object.
+ */
+export type NewTableObject = {
+    object: Objects.Table,
+    instance: Table
 };
 
 /**

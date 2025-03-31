@@ -70,7 +70,8 @@ export enum Objects {
     Line,
     Circle,
     Parabola,
-    Ellipse
+    Ellipse,
+    Table
 }
 
 /**
