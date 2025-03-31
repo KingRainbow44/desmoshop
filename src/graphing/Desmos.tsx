@@ -1,7 +1,5 @@
 import Logger from "@app/Logger.ts";
-import { createRoot } from "react-dom/client";
 
-import Settings from "@ui/Settings.tsx";
 import Transaction, { Consumer } from "@graphing/Transaction.ts";
 import useGlobal from "@stores/Global.ts";
 
@@ -32,21 +30,6 @@ class Desmos {
      */
     public static init(): void {
         Desmos.container = document.getElementById("graph-container") as HTMLDivElement;
-
-        // Create settings window.
-        const settingsWindow = document.createElement("div");
-        settingsWindow.id = "settings-window";
-        settingsWindow.style.display = "flex";
-        settingsWindow.style.position = "absolute";
-        settingsWindow.style.bottom = "16px";
-        settingsWindow.style.right = "16px";
-        settingsWindow.style.zIndex = "100";
-
-        document.body.appendChild(settingsWindow);
-
-        // Mount the settings window.
-        const root = createRoot(settingsWindow);
-        root.render(<Settings />);
 
         // Create task to update points.
         setInterval(Desmos.updatePoints, 10e3);
