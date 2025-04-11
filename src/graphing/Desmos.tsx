@@ -269,6 +269,37 @@ class Desmos {
             Math.pow(a.y - b.y, 2)
         );
     }
+
+    /**
+     * Converts a value to a string with the given precision.
+     *
+     * @param value The value to convert.
+     * @param precision The precision to use.
+     */
+    public static toPrecision(value: string | number, precision: number): string {
+        let parsed: number;
+        if (typeof value == "string") {
+            // Check if the value is a number.
+            parsed = parseFloat(value);
+            if (isNaN(parsed)) {
+                return value;
+            }
+        } else {
+            parsed = value;
+        }
+
+        // Round the value.
+        let rounded = parsed.toFixed(precision);
+
+        // Drop trailing zeros.
+        if (rounded.includes('.')) {
+            rounded = rounded
+                .replace(/0+$/, '')
+                .replace(/\.$/, '');
+        }
+
+        return rounded;
+    }
 }
 
 export default Desmos;

@@ -6,7 +6,7 @@ import useGlobal from "@stores/Global.ts";
 /**
  * The color used for lines.
  */
-const COLOR = "#000000";
+export const COLOR = "#000000";
 
 /**
  * Defined in LaTeX as:

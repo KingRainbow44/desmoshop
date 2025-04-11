@@ -5,7 +5,7 @@ import useGlobal from "@stores/Global.ts";
 /**
  * The color used for parabolas.
  */
-const COLOR = "#";
+export const COLOR = "#c74440";
 
 enum State {
     PLOT_VERTEX,

@@ -11,7 +11,7 @@ class Transaction {
     private _points: Coordinates[] = [];
 
     constructor(
-        private readonly state: GraphState,
+        public readonly state: GraphState,
         private readonly consumer: Consumer = undefined
     ) {
     }
@@ -41,12 +41,46 @@ class Transaction {
     }
 
     /**
+     * Returns all expressions in the transaction.
+     */
+    get expressions(): ExpressionState[] {
+        return this.state.expressions.list;
+    }
+
+    /**
      * Gets the index of the expression with the given ID.
      *
      * @param id The ID of the expression.
      */
     public indexOf(id: string): number {
         return this.expr.findIndex((expr) => expr.id == id);
+    }
+
+    /**
+     * Finds all expressions below a given element.
+     * This is not inclusive of the element.
+     *
+     * @param id The ID of the expression to find below.
+     * @param folders Should folders be included? This will stop at the first folder seen if not.
+     */
+    public allBelow(id: string, folders: boolean = true): ExpressionState[] {
+        const index = this.indexOf(id);
+        const elements = this.expressions.slice(index + 1);
+
+        // If we are including folders, return the list as-is.
+        if (folders) {
+            return elements;
+        }
+
+        // Otherwise, get the ID of the next folder.
+        const nextFolder = elements.find((expr) => expr.type == "folder");
+        if (nextFolder?.id) {
+            const nextIndex = this.indexOf(nextFolder.id);
+            return elements.slice(0, nextIndex);
+        }
+
+        // Return elements if there are no folders next.
+        return elements;
     }
 
     /**
@@ -107,6 +141,20 @@ class Transaction {
     ): Transaction {
         if (condition) {
             callback(this, this.lastId);
+        }
+
+        return this;
+    }
+
+    /**
+     * Removes an expression from the transaction.
+     *
+     * @param id The ID of the expression to remove.
+     */
+    public remove(id: string): Transaction {
+        const index = this.indexOf(id);
+        if (index >= 0) {
+            this.expr.splice(index, 1);
         }
 
         return this;
