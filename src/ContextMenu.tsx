@@ -65,6 +65,23 @@ function ItemContextMenu() {
     }
 
     /**
+     * Creates a point at the point.
+     * This only executes if the point is a point.
+     *
+     * @param props The item parameters.
+     */
+    function createPoint({ props }: ActionParams) {
+        if (!props) return;
+        const { expr } = props;
+
+        const point = Desmos.parsePoint(expr.latex ?? "");
+        if (point == undefined) return;
+
+        // Create the point.
+        Actions.snapPoint(point);
+    }
+
+    /**
      * Creates a parabola at the point.
      * This only executes if the point is a point.
      *
@@ -128,6 +145,7 @@ function ItemContextMenu() {
     return (
         <Menu id={"context"}>
             <Item onClick={copy}>Copy</Item>
+            <Item onClick={createPoint}>Snap From</Item>
 
             <Separator />
 

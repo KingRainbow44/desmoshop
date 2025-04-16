@@ -84,6 +84,13 @@ class Interaction {
     }
 
     /**
+     * Checks if the user is holding the 'Shift' key.
+     */
+    public static isHoldingShift(): boolean {
+        return Interaction.pressed.has("ShiftLeft");
+    }
+
+    /**
      * Checks if the specified keys are being pressed.
      *
      * All keys must be pressed to pass.

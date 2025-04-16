@@ -10,6 +10,7 @@ import Exclusion from "@graphing/operations/Exclusion.ts";
 
 import BaseObject, { Objects, Operations } from "@graphing/BaseObject.ts";
 import Table from "@graphing/operations/Table.ts";
+import SnapPoint from "@graphing/operations/SnapPoint.ts";
 
 /**
  * The types of events to be emitted by the grapher.
@@ -80,7 +81,7 @@ class Actions {
     /**
      * Finishing the existing operation.
      */
-    private static finish(): void {
+    public static finish(): void {
         // Check if we are working.
         if (Actions.working === undefined) return;
 
@@ -193,6 +194,21 @@ class Actions {
             instance: Actions.working
         } as NewObject);
     }
+
+    /**
+     * Adds a snap point to the working expression.
+     */
+    public static snapPoint(point: Coordinates): void {
+        // Create a new snap point instance.
+        Actions.working = new SnapPoint(point);
+
+        // Emit the event.
+        Actions.emitter.emit(Events.NewObject, {
+            type: "newObject",
+            object: Objects.Point,
+            instance: Actions.working
+        } as NewObject);
+    }
 }
 
 export default Actions;
@@ -207,7 +223,7 @@ export type Expression = ExpressionState & { type: "expression" };
  */
 export type NewObject = {
     type: "newObject";
-} & (NewLineObject | NewCircleObject | NewParabolaObject | NewTableObject);
+} & (NewLineObject | NewCircleObject | NewParabolaObject | NewTableObject | NewPointObject);
 
 /**
  * An event signifying the start of a new operation.
@@ -249,6 +265,14 @@ export type NewTableObject = {
 };
 
 /**
+ * An event signifying the creation of a new snap point object.
+ */
+export type NewPointObject = {
+    object: Objects.Point,
+    instance: SnapPoint
+};
+
+/**
  * An event signifying the creation of a new restriction.
  */
 export type NewRestriction = {
@@ -262,4 +286,4 @@ export type NewRestriction = {
 export type NewExclusion = {
     operation: Operations.Exclusion,
     instance: Exclusion
-}
+};
