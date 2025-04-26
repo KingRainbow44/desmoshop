@@ -2,6 +2,7 @@ import Logger from "@app/Logger.ts";
 
 import Transaction, { Consumer } from "@graphing/Transaction.ts";
 import useGlobal from "@stores/Global.ts";
+import Utility from "@graphing/Utility.ts";
 
 /**
  * This regular expression is used to match a point in LaTeX.
@@ -32,7 +33,9 @@ class Desmos {
         Desmos.container = document.getElementById("graph-container") as HTMLDivElement;
 
         // Create task to update points.
-        setInterval(Desmos.updatePoints, 10e3);
+        setInterval(Desmos.checkSelected, 5e2);
+        setInterval(Desmos.updatePoints, 1e3);
+
         setTimeout(Desmos.updatePoints, 1e3);
         // Add function to fetch points.
         (window as any).getPoints = () => Desmos.pointCache;
@@ -123,6 +126,30 @@ class Desmos {
     }
 
     /**
+     * Fetches an expression by its ID.
+     *
+     * @param id The ID of the expression.
+     */
+    public static getExpression(id: string): ExpressionState | undefined {
+        return Calc.getState().expressions.list
+            .filter((expr) => expr.type == "expression")
+            .filter((expr) => expr.id == id)
+            .pop();
+    }
+
+    /**
+     * Checks the selected expression.
+     */
+    public static checkSelected(): void {
+        const selectedId = Calc.selectedExpressionId;
+        const selected = Desmos.getExpression(selectedId);
+
+        if (selected) {
+            Utility.moveExpression(selected);
+        }
+    }
+
+    /**
      * Checks the state of points.
      */
     public static updatePoints(): void {
@@ -146,6 +173,24 @@ class Desmos {
             })
             // Filter out undefined values.
             .filter((point) => point != undefined);
+    }
+
+    /**
+     * Caches the point if it doesn't exist in the cache.
+     *
+     * @param point The point to cache.
+     * @param id The ID of the point's expression.
+     */
+    public static cachePoint(point: Coordinates, id: string): void {
+        // Check if the point is already in the cache.
+        const cached = Desmos.pointCache
+            .filter((p) => p.x == point.x && p.y == point.y)
+            .pop();
+
+        // If the point is not in the cache, add it.
+        if (cached == undefined) {
+            Desmos.pointCache.push({ ...point, id });
+        }
     }
 
     /**

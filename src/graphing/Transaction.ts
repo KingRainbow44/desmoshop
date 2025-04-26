@@ -104,6 +104,35 @@ class Transaction {
     }
 
     /**
+     * Updates the expression in the transaction.
+     *
+     * @param expr The expression to update.
+     */
+    public update(expr: ExpressionState): Transaction {
+        // Check if an ID was specified.
+        if (!expr.id) {
+            throw new Error("No ID specified for update.");
+        }
+
+        const selected = this.expr
+            .filter((e) => e.id == expr.id)
+            .pop();
+
+        if (selected) {
+            // Update the expression.
+            Object.assign(selected, expr);
+
+            // Update the expression in the transaction.
+            const index = this.indexOf(expr.id);
+            if (index >= 0) {
+                this.expr[index] = selected;
+            }
+        }
+
+        return this;
+    }
+
+    /**
      * Adds an expression to the transaction.
      *
      * @param func The function to generate the expression.

@@ -134,7 +134,8 @@ class Interaction {
             case 0: {
                 // Resolve the clicked point.
                 // If we are in an action, we should try looking at other points.
-                const point = Desmos.resolvePoint(event, isAction);
+                const others = isAction && !Interaction.isHoldingShift();
+                const point = Desmos.resolvePoint(event, others);
 
                 if (isAction) {
                     // If we are working, invoke the 'addPoint' method.

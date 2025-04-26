@@ -11,6 +11,11 @@ import { COLOR as ParabolaColor } from "@graphing/objects/Parabola.ts";
 const COMBINE_TEXT = "--- COMBINE BELOW ---";
 
 /**
+ * This regular expression is used to match a point in LaTeX.
+ */
+const POINT_REGEX = /\((.*),(.*)\)/;
+
+/**
  * This is a regular expression for a domain restriction.
  */
 const DOMAIN_RESTRICTION = /\\left\\\{(-?[\d.]+)(\\le|\\ge|<|>)\s?([xy])(\\le|\\ge|<|>)(-?[\d.]+)\\right\\}/;
@@ -208,6 +213,39 @@ class Utility {
         }
 
         // Commit all changes.
+        t.commit();
+    }
+
+    /**
+     * Moves an expression to the correct folder.
+     *
+     * @param expr An expression.
+     */
+    public static moveExpression(expr: ExpressionState): void {
+        // Check if the expression is an expression.
+        if (expr.type != "expression") return;
+
+        // Get the expression's LaTeX.
+        const { id, folderId, latex } = expr;
+        if (!id || !latex) return;
+
+        // Validate the expression against the regular expressions.
+        const t = Desmos.transaction();
+        if (POINT_REGEX.test(latex) && folderId != "reference-points") {
+            t
+                .update({ id, color: "#c74440" })
+                .parent(id, "reference-points");
+
+            // Check if the point is stored in the cache.
+            const point = Desmos.parsePoint(latex);
+            if (point == undefined) return;
+
+            Desmos.cachePoint(point, id);
+        } else {
+            return;
+        }
+
+        // Commit the changes.
         t.commit();
     }
 }
