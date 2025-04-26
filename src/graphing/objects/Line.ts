@@ -47,7 +47,7 @@ class Line extends BaseObject {
 
         // If the slope is undefined or infinite, use a horizontal line equation.
         const transaction = Desmos.transaction();
-        if (!validSlope || Interaction.isHoldingModifier()) {
+        if (!validSlope) {
             // Determine the minimum and maximum 'y' values.
             const minY = Math.min(first.y, second.y);
             const maxY = Math.max(first.y, second.y);
