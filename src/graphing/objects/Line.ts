@@ -40,6 +40,11 @@ class Line extends BaseObject {
         );
         const validSlope = !isNaN(m) && isFinite(m);
 
+        // If the slope is invalid, log the value.
+        if (!validSlope) {
+            console.error(`Invalid slope: ${m}. NaN? ${isNaN(m)}. Infinite? ${!isFinite(m)}`);
+        }
+
         // If the slope is undefined or infinite, use a horizontal line equation.
         const transaction = Desmos.transaction();
         if (!validSlope || Interaction.isHoldingModifier()) {
