@@ -147,7 +147,7 @@ class Interaction {
                 const others = isAction && !Interaction.isHoldingShift();
                 const point = Desmos.resolvePoint(event, others);
 
-                if (isAction) {
+                if (isAction && !Interaction.isHoldingCtrl()) {
                     // If we are working, invoke the 'addPoint' method.
 
                     // Prevent the default behavior.
