@@ -23,7 +23,7 @@ class Desmos {
      * This is a cache of all known coordinates.
      * @private
      */
-    private static pointCache: CachedPoint[] = [];
+    public static pointCache: CachedPoint[] = [];
 
     /**
      * Loads all elements needed for the Desmos library.

@@ -55,10 +55,10 @@ class SnapPoint extends BaseObject {
     }
 
     /**
-     * Generates the LaTeX representation of the point.
+     * Returns the coordinates of the point.
      * @private
      */
-    private get latex(): string {
+    private get point(): Coordinates {
         let { x, y } = this.ref;
 
         switch (this.axis) {
@@ -79,6 +79,16 @@ class SnapPoint extends BaseObject {
                 break;
             }
         }
+
+        return { x, y };
+    }
+
+    /**
+     * Generates the LaTeX representation of the point.
+     * @private
+     */
+    private get latex(): string {
+        let { x, y } = this.point;
 
         // Format the coordinates.
         const { precision } = useGlobal.getState();
@@ -159,7 +169,11 @@ class SnapPoint extends BaseObject {
      * @inheritDoc
      */
     public render(): void {
-        Desmos.transaction()
+        Desmos.transaction((t) => {
+            // Update the point cache.
+            const { x, y } = this.point;
+            Desmos.pointCache.push({ x, y, id: t.lastId });
+        })
             .expression((id) => ({
                 type: "expression", id,
                 latex: this.latex,
