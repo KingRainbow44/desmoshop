@@ -19,7 +19,7 @@ const KEYBOARD_SHORTCUTS: Shortcuts = {
 
     // Inline keyboard shortcuts for changing the precision.
     "Minus": () => useGlobal.getState().changePrecision(-1),
-    "Equal": () => useGlobal.getState().changePrecision(1)
+    "Equal": () => useGlobal.getState().changePrecision(1),
 };
 
 /**
@@ -32,6 +32,9 @@ const KEYBOARD_ACTIONS: Shortcuts = {
     "Numpad1": Actions.line,
     "Numpad2": Actions.circle,
     "Numpad3": Actions.parabola,
+
+    // Keyboard shortcut for deleting expressions quickly.
+    "Delete": Actions.delete
 };
 
 /**
@@ -81,6 +84,13 @@ class Interaction {
      */
     public static isHoldingModifier(): boolean {
         return Interaction.pressed.has("AltLeft");
+    }
+
+    /**
+     * Checks if the user is holding the 'Control' key.
+     */
+    public static isHoldingCtrl(): boolean {
+        return Interaction.pressed.has("ControlLeft");
     }
 
     /**

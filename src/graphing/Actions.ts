@@ -79,6 +79,19 @@ class Actions {
     }
 
     /**
+     * Deletes all expressions currently selected.
+     */
+    public static delete(): void {
+        for (const selected of Desmos.multiSelect) {
+            if (selected.id) {
+                Calc.removeExpression({ id: selected.id });
+            }
+        }
+
+        Desmos.multiSelect.length = 0;
+    }
+
+    /**
      * Finishing the existing operation.
      */
     public static finish(): void {

@@ -3,6 +3,7 @@ import Logger from "@app/Logger.ts";
 import Transaction, { Consumer } from "@graphing/Transaction.ts";
 import useGlobal from "@stores/Global.ts";
 import Utility from "@graphing/Utility.ts";
+import Interaction from "@app/Interaction.ts";
 
 /**
  * This regular expression is used to match a point in LaTeX.
@@ -22,9 +23,19 @@ class Desmos {
 
     /**
      * This is a cache of all known coordinates.
-     * @private
      */
     public static pointCache: CachedPoint[] = [];
+
+    /**
+     * This is a list of currently 'multi-selected' expressions.
+     */
+    public static multiSelect: ExpressionState[] = [];
+
+    /**
+     * The ID of the last expression selected.
+     * @private
+     */
+    private static lastSelected: string | undefined = undefined;
 
     /**
      * Loads all elements needed for the Desmos library.
@@ -33,7 +44,7 @@ class Desmos {
         Desmos.container = document.getElementById("graph-container") as HTMLDivElement;
 
         // Create task to update points.
-        setInterval(Desmos.checkSelected, 5e2);
+        setInterval(Desmos.checkSelected, 250);
         setInterval(Desmos.updatePoints, 1e3);
 
         setTimeout(Desmos.updatePoints, 1e3);
@@ -142,10 +153,41 @@ class Desmos {
      */
     public static checkSelected(): void {
         const selectedId = Calc.selectedExpressionId;
+
+        // Check if the selected ID is the same as the last selected ID.
+        if (selectedId == Desmos.lastSelected) {
+            return;
+        }
+
+        // Update the last selected ID.
+        Desmos.lastSelected = selectedId;
+
         const selected = Desmos.getExpression(selectedId);
 
         if (selected) {
+            // Try moving the expression.
             Utility.moveExpression(selected);
+
+            // If the 'Ctrl' key is held, add the expression to the multi-select.
+            if (Interaction.isHoldingCtrl()) {
+                // Check if the expression is already selected.
+                const index = Desmos.multiSelect
+                    .filter((expr) => expr.id == selectedId)
+                    .pop();
+
+                // If the expression is not selected, add it.
+                if (index == undefined) {
+                    Desmos.multiSelect.push(selected);
+                } else {
+                    // Otherwise, remove it.
+                    Desmos.multiSelect = Desmos.multiSelect
+                        .filter((expr) => expr.id != selectedId);
+                }
+            } else {
+                // Remove all other expressions from the multi-select.
+                Desmos.multiSelect.length = 0;
+                Desmos.multiSelect.push(selected);
+            }
         }
     }
 
