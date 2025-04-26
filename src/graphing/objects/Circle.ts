@@ -1,6 +1,7 @@
 import Desmos from "@graphing/Desmos.tsx";
 import BaseObject from "@graphing/BaseObject.ts";
 import useGlobal from "@stores/Global.ts";
+import Interaction from "@app/Interaction.ts";
 
 /**
  * The color used for circles.
@@ -70,7 +71,8 @@ class Circle extends BaseObject {
         const [first] = this.points;
 
         // Convert the mouse coordinates into graph coordinates.
-        const cursor = Desmos.resolvePoint(event);
+        const others = !Interaction.isHoldingShift();
+        const cursor = Desmos.resolvePoint(event, others);
 
         // Set the radius.
         this.radius = Desmos.distance(first, cursor);
