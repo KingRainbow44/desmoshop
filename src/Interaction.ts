@@ -103,6 +103,13 @@ class Interaction {
     }
 
     /**
+     * Checks if the user is holding the 'Caps Lock' key.
+     */
+    public static isHoldingCaps(): boolean {
+        return Interaction.pressed.has("CapsLock");
+    }
+
+    /**
      * Checks if the specified keys are being pressed.
      *
      * All keys must be pressed to pass.

@@ -4,6 +4,7 @@ import { contextMenu, Item, ItemParams, Menu, Separator } from "react-contexify"
 import Logger from "@app/Logger.ts";
 import Desmos from "@graphing/Desmos.tsx";
 import Actions from "@graphing/Actions.ts";
+import Interaction from "@app/Interaction.ts";
 
 class ContextMenu {
     /**
@@ -120,7 +121,8 @@ function ItemContextMenu() {
         }
 
         // Create a new restriction object.
-        Actions.restriction(expr);
+        const usingY = Interaction.isHoldingCtrl();
+        Actions.restriction(expr, usingY);
     }
 
     /**
@@ -150,7 +152,7 @@ function ItemContextMenu() {
             <Separator />
 
             <Item onClick={createParabola}>New Parabola</Item>
-            <Item onClick={restrict}>Restrict ('x' only)</Item>
+            <Item onClick={restrict}>Restrict</Item>
             <Item onClick={exclude}>Exclude ('x' only)</Item>
         </Menu>
     );

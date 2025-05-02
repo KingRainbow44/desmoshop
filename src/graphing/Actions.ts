@@ -182,9 +182,9 @@ class Actions {
     /**
      * Adds a restriction to the working expression.
      */
-    public static restriction(expression: Expression): void {
+    public static restriction(expression: Expression, y: boolean = true): void {
         // Create a new restriction.
-        Actions.working = new Restriction(expression);
+        Actions.working = new Restriction(expression, y);
 
         // Emit the event.
         Actions.emitter.emit(Events.NewObject, {
