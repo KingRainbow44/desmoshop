@@ -11,6 +11,7 @@ import Exclusion from "@graphing/operations/Exclusion.ts";
 import BaseObject, { Objects, Operations } from "@graphing/BaseObject.ts";
 import Table from "@graphing/operations/Table.ts";
 import SnapPoint from "@graphing/operations/SnapPoint.ts";
+import Ellipse from "@graphing/objects/Ellipse.ts";
 
 /**
  * The types of events to be emitted by the grapher.
@@ -164,6 +165,21 @@ class Actions {
     }
 
     /**
+     * Initializes graphing an ellipse.
+     */
+    public static ellipse(): void {
+        // Create a new ellipse instance.
+        Actions.working = new Ellipse();
+
+        // Emit the event.
+        Actions.emitter.emit(Events.NewObject, {
+            type: "newObject",
+            object: Objects.Ellipse,
+            instance: Actions.working
+        } as NewObject);
+    }
+
+    /**
      * Adds a restriction to the working expression.
      */
     public static restriction(expression: Expression): void {
@@ -236,7 +252,10 @@ export type Expression = ExpressionState & { type: "expression" };
  */
 export type NewObject = {
     type: "newObject";
-} & (NewLineObject | NewCircleObject | NewParabolaObject | NewTableObject | NewPointObject);
+} & (
+    NewLineObject | NewCircleObject | NewParabolaObject |
+    NewEllipseObject | NewTableObject | NewPointObject
+    );
 
 /**
  * An event signifying the start of a new operation.
@@ -267,6 +286,14 @@ export type NewCircleObject = {
 export type NewParabolaObject = {
     object: Objects.Parabola,
     instance: Parabola
+};
+
+/**
+ * An event signifying the creation of a new ellipse object.
+ */
+export type NewEllipseObject = {
+    object: Objects.Ellipse,
+    instance: Ellipse
 };
 
 /**

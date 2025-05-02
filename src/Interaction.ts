@@ -15,6 +15,7 @@ const KEYBOARD_SHORTCUTS: Shortcuts = {
     "Digit1": Actions.line,
     "Digit2": Actions.circle,
     "Digit3": Actions.parabola,
+    "Digit4": Actions.ellipse,
     "Backquote": Actions.folders,
 
     // Inline keyboard shortcuts for changing the precision.
@@ -32,6 +33,7 @@ const KEYBOARD_ACTIONS: Shortcuts = {
     "Numpad1": Actions.line,
     "Numpad2": Actions.circle,
     "Numpad3": Actions.parabola,
+    "Numpad4": Actions.ellipse,
 
     // Keyboard shortcut for deleting expressions quickly.
     "Delete": Actions.delete
