@@ -64,6 +64,8 @@ class Utility {
 
         // Iterate through all folders.
         const folders = toCombine.filter((expr) => expr.type == "folder");
+        console.log("[Combine] Looking at folders:", folders);
+
         for (const folder of folders) {
             if (!folder.id) {
                 Logger.error("Folder has no ID?");
@@ -73,13 +75,17 @@ class Utility {
             // Find the first root folder.
             const [rootFolder] = t.expressions
                 .filter((expr) => expr.type == "folder" && expr.title == folder.title);
-            if (!rootFolder?.id) {
+            if (rootFolder.type != "folder" || !rootFolder?.id) {
                 Logger.error("No root folder found.");
                 continue;
             }
 
+            console.log(`[Combine] Root folder ${rootFolder.title} (${rootFolder.id}) found for ${folder.title} (${folder.id})`);
+
             // Move all elements to the root folder.
             const elements = t.allBelow(folder.id, false);
+            console.log(`[Combine] All below ${folder.title} (${folder.id})`, elements);
+
             for (const element of elements) {
                 if (element.id) {
                     t.parent(element.id, rootFolder.id);

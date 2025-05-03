@@ -69,17 +69,24 @@ class Transaction {
 
         // If we are including folders, return the list as-is.
         if (folders) {
+            console.log(`[Transaction] Returning as-is, all below ${id}`, elements);
             return elements;
         }
 
         // Otherwise, get the ID of the next folder.
         const nextFolder = elements.find((expr) => expr.type == "folder");
         if (nextFolder?.id) {
-            const nextIndex = this.indexOf(nextFolder.id);
-            return elements.slice(0, nextIndex);
+            const nextIndex = elements
+                .findIndex((expr) => expr.id == nextFolder?.id);
+            const excluded = elements.slice(0, nextIndex);
+
+            console.log(`[Transaction] Next folder found: ${nextFolder.id}`, excluded);
+
+            return excluded;
         }
 
         // Return elements if there are no folders next.
+        console.log(`[Transaction] No folders found, returning all below ${id}`, elements);
         return elements;
     }
 
