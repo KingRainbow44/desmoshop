@@ -6,7 +6,7 @@ import Desmos from "@graphing/Desmos.tsx";
 /**
  * THe color used for ellipses.
  */
-const COLOR = "#388c46";
+export const COLOR = "#388c46";
 
 enum State {
     PLOT_CENTER,

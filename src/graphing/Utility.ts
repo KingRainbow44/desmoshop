@@ -3,6 +3,7 @@ import Logger from "@app/Logger.ts";
 import useGlobal from "@stores/Global.ts";
 
 import { COLOR as LineColor } from "@graphing/objects/Line.ts";
+import { COLOR as EllipseColor } from "@graphing/objects/Ellipse.ts";
 import { COLOR as ParabolaColor } from "@graphing/objects/Parabola.ts";
 
 /**
@@ -14,6 +15,11 @@ const COMBINE_TEXT = "--- COMBINE BELOW ---";
  * This regular expression is used to match a point in LaTeX.
  */
 const POINT_REGEX = /\((.*),(.*)\)/;
+
+/**
+ * The LaTeX representation of a `Math.pow(2)` operation.
+ */
+const EXPONENT = "^{2}";
 
 /**
  * This is a regular expression for a domain restriction.
@@ -39,6 +45,11 @@ const LINE_STRAIGHT = /x=(-?[\d.]+)/
  * This is a regular expression for a parabola.
  */
 const PARABOLA = /\(x-(-?[\d.]+)\)\^\{2}=4\\cdot(-?[\d.]+)\(y-(-?[\d.]+)\)/;
+
+/**
+ * This is a regular expression for an ellipse.
+ */
+const ELLIPSE = /\\frac{\\left\(x-(-?[\d.]+)\\right\)\^\{2}}{(-?[\d.]+)\^\{2}}\+\\frac{\\left\(y-(-?[\d.]+)\\right\)\^\{2}}{(-?[\d.]+)\^\{2}}=1/;
 
 /**
  * A collection of general-purpose Desmos utilities.
@@ -146,7 +157,7 @@ class Utility {
 
                 newExpression = `y-${y1}=${m}\\left(x-${x1}\\right)`;
                 expr.color = LineColor;
-            } else if (LINE_STRAIGHT.test(latex)) {
+            } else if (LINE_STRAIGHT.test(latex) && !latex.includes(EXPONENT)) {
                 const matches = latex.match(LINE_STRAIGHT);
                 if (matches == null) {
                     Logger.error("Failed to match line expression.");
@@ -176,6 +187,25 @@ class Utility {
 
                 newExpression = `(x-${x1})^2=4\\cdot${p}\\left(y-${y1}\\right)`;
                 expr.color = ParabolaColor;
+            } else if (ELLIPSE.test(latex)) {
+                const matches = latex.match(ELLIPSE);
+                if (matches == null) {
+                    Logger.error("Failed to match ellipse expression.");
+                    continue;
+                }
+
+                let [, h, a, k, b] = matches;
+
+                // Round all values to the current precision.
+                h = Desmos.toPrecision(h, precision);
+                a = Desmos.toPrecision(a, precision);
+                k = Desmos.toPrecision(k, precision);
+                b = Desmos.toPrecision(b, precision);
+
+                newExpression = `\\frac{\\left(x-${h}\\right)^{2}}{${a}^{2}}+\\frac{\\left(y-${k}\\right)^{2}}{${b}^{2}}=1`;
+                console.log(newExpression);
+
+                expr.color = EllipseColor;
             } else {
                 newExpression = latex;
                 continue;
