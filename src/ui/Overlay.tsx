@@ -21,6 +21,10 @@ function Overlay() {
                 <button onClick={Utility.simplify}>
                     Simplify Expressions
                 </button>
+
+                <button onClick={Utility.filterDuplicates}>
+                    Filter Duplicates
+                </button>
             </div>
         </div>
     );

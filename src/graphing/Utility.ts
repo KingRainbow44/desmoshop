@@ -284,6 +284,42 @@ class Utility {
         // Commit the changes.
         t.commit();
     }
+
+    /**
+     * Filters duplicate equations.
+     */
+    public static filterDuplicates(): void {
+        const t = Desmos.transaction();
+        
+        // Create a set of existing equations.
+        const existing = new Set<string>();
+        
+        // Iterate through all equations.
+        for (const expr of t.expressions) {
+            if (expr.type != "expression") {
+                continue;
+            }
+            
+            // Check if the expression is a duplicate.
+            const { latex } = expr;
+            if (latex == undefined) {
+                continue;
+            }
+            
+            // Check if the expression is a duplicate.
+            if (existing.has(latex)) {
+                // Remove the expression.
+                if (expr.id) {
+                    t.remove(expr.id);
+                }
+            } else {
+                // Add the expression to the set.
+                existing.add(latex);
+            }
+        }
+        
+        t.commit();
+    }
 }
 
 export default Utility;

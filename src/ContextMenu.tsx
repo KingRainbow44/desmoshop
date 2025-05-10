@@ -121,7 +121,9 @@ function ItemContextMenu() {
         }
 
         // Create a new restriction object.
-        const usingY = Interaction.isHoldingCtrl();
+        const usingY = 
+            Interaction.isHoldingCtrl() || 
+            Interaction.isHoldingShift();
         Actions.restriction(expr, usingY);
     }
 
